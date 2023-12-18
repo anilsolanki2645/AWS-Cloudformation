@@ -1,0 +1,394 @@
+###################################### Important Notes ########################################### 
+
+    #1. First must be change Availibility zone value in this script
+    #2. Setup all the things acording to your requirements
+
+###################################################################################################
+
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+
+######################################## VPC Parameters #########################################
+
+  vpcCidrBlock:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: Enter 10.0.0.0/16, 10.0.0.0/8, 10.0.0.0/24 etc. Default is 10.0.0.0/16.
+
+  vpcName:
+    Type: String
+    Default: DemoVPC
+    Description: Enter the Vpc Name.
+
+######################################## Subnet Parameters #########################################
+
+#parameter for publicsubnet1
+
+  PublicSubnet1CidrBlock:
+    Type: String
+    Default: 10.0.0.0/24
+    Description: Enter the CidrBlock for PublicSubnet1.
+
+  PublicSubnet1AvailabilityZone:
+    Type: String
+    Default: ap-south-1a
+    AllowedValues:
+      - ap-south-1a
+      - ap-south-1b
+      - ap-south-1c
+    Description: Select AvailabilityZone for PublicSubnet1.
+
+  PublicSubnet1MapPublicIpOnLaunch:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Enter MapPublicIpOnLaunch for PublicSubnet1 , if it is true then assign public ip otherwise not assign.
+
+  PublicSubnet1Name:
+    Type: String
+    Default: public-subnet-1
+    Description: Enter Name for PublicSubnet1.
+
+#parameter for publicsubnet2
+
+  PublicSubnet2CidrBlock:
+    Type: String
+    Default: 10.0.1.0/24
+    Description: Enter the CidrBlock for PublicSubnet2.
+
+  PublicSubnet2AvailabilityZone:
+    Type: String
+    Default: ap-south-1b
+    AllowedValues:
+      - ap-south-1a
+      - ap-south-1b
+      - ap-south-1c
+    Description: Select AvailabilityZone for PublicSubnet2.
+
+  PublicSubnet2MapPublicIpOnLaunch:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Enter MapPublicIpOnLaunch for PublicSubnet2 , if it is true then assign public ip otherwise not assign.
+
+  PublicSubnet2Name:
+    Type: String
+    Default: public-subnet-2
+    Description: Enter Name for PublicSubnet2.
+
+#parameter for publicsubnet3
+
+  PublicSubnet3CidrBlock:
+    Type: String
+    Default: 10.0.2.0/24
+    Description: Enter the CidrBlock for PublicSubnet3.
+
+  PublicSubnet3AvailabilityZone:
+    Type: String
+    Default: ap-south-1c
+    AllowedValues:
+      - ap-south-1a
+      - ap-south-1b
+      - ap-south-1c
+    Description: Select AvailabilityZone for PublicSubnet3.
+
+  PublicSubnet3MapPublicIpOnLaunch:
+    Type: String
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Enter MapPublicIpOnLaunch for PublicSubnet3 , if it is true then assign public ip otherwise not assign.
+
+  PublicSubnet3Name:
+    Type: String
+    Default: public-subnet-3
+    Description: Enter Name for PublicSubnet3.
+
+#parameter for PrivateSubnet1
+
+  PrivateSubnet1CidrBlock:
+    Type: String
+    Default: 10.0.3.0/24
+    Description: Enter the CidrBlock for PrivateSubnet1.
+
+  PrivateSubnet1AvailabilityZone:
+    Type: String
+    Default: ap-south-1a
+    AllowedValues:
+      - ap-south-1a
+      - ap-south-1b
+      - ap-south-1c
+    Description: Select AvailabilityZone for PrivateSubnet1.
+
+  PrivateSubnet1Name:
+    Type: String
+    Default: private-subnet-1
+    Description: Enter Name for PrivateSubnet1.
+
+#parameter for PrivateSubnet2
+
+  PrivateSubnet2CidrBlock:
+    Type: String
+    Default: 10.0.4.0/24
+    Description: Enter the CidrBlock for PrivateSubnet2.
+
+  PrivateSubnet2AvailabilityZone:
+    Type: String
+    Default: ap-south-1b
+    AllowedValues:
+      - ap-south-1a
+      - ap-south-1b
+      - ap-south-1c
+    Description: Select AvailabilityZone for PrivateSubnet2.
+
+  PrivateSubnet2Name:
+    Type: String
+    Default: private-subnet-2
+    Description: Enter Name for PrivateSubnet2.
+
+#parameter for PrivateSubnet3
+
+  PrivateSubnet3CidrBlock:
+    Type: String
+    Default: 10.0.5.0/24
+    Description: Enter the CidrBlock for PrivateSubnet3.
+
+  PrivateSubnet3AvailabilityZone:
+    Type: String
+    Default: ap-south-1c
+    AllowedValues:
+      - ap-south-1a
+      - ap-south-1b
+      - ap-south-1c
+    Description: Select AvailabilityZone for PrivateSubnet3.
+
+  PrivateSubnet3Name:
+    Type: String
+    Default: private-subnet-3
+    Description: Enter Name for PrivateSubnet3.
+
+# Demopublic internet gateway Parameter
+
+  internetgatewayName:
+    Type: String
+    Default: Demopublic-InternetGateway
+    Description: Enter Name for internet gateway.
+
+######################################## Route tables and Nat Gateway Parameters #########################################
+
+  DemopublicroutetablesName:
+    Type: String
+    Default: Demopublic-RouteTable
+    Description: Enter Name for Route tables.
+
+  DemoprivateroutetablesName:
+    Type: String
+    Default: Demoprivate-RouteTable
+    Description: Enter Name for Route tables.
+
+  natGatewayName:
+    Type: String
+    Default: Demoprivate-NATGateway
+    Description: Enter Name for NATGateway.
+
+
+###################################### complete parameter section ##########################################
+
+# vpc
+Resources:
+  DemoVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref vpcCidrBlock
+      Tags:
+        - Key: Name
+          Value: !Ref vpcName
+
+# public subnet
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DemoVPC
+      CidrBlock: !Ref PublicSubnet1CidrBlock
+      AvailabilityZone: !Ref PublicSubnet1AvailabilityZone
+      MapPublicIpOnLaunch: !Ref PublicSubnet1MapPublicIpOnLaunch
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnet1Name
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DemoVPC
+      CidrBlock: !Ref PublicSubnet2CidrBlock
+      AvailabilityZone: !Ref PublicSubnet2AvailabilityZone
+      MapPublicIpOnLaunch: !Ref PublicSubnet2MapPublicIpOnLaunch
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnet2Name
+
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DemoVPC
+      CidrBlock: !Ref PublicSubnet3CidrBlock
+      AvailabilityZone: !Ref PublicSubnet3AvailabilityZone
+      MapPublicIpOnLaunch: !Ref PublicSubnet3MapPublicIpOnLaunch
+      Tags:
+        - Key: Name
+          Value: !Ref PublicSubnet3Name
+
+# private subnet
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DemoVPC
+      CidrBlock: !Ref PrivateSubnet1CidrBlock
+      AvailabilityZone: !Ref PrivateSubnet1AvailabilityZone
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnet1Name
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DemoVPC
+      CidrBlock: !Ref PrivateSubnet2CidrBlock
+      AvailabilityZone: !Ref PrivateSubnet2AvailabilityZone
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnet2Name
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DemoVPC
+      CidrBlock: !Ref PrivateSubnet3CidrBlock
+      AvailabilityZone: !Ref PrivateSubnet3AvailabilityZone
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateSubnet3Name
+
+# Demopublic internet gateway
+
+  DemopublicInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref internetgatewayName
+  DemoVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref DemoVPC
+      InternetGatewayId: !Ref DemopublicInternetGateway
+
+# Route tables
+
+  DemopublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref DemoVPC
+      Tags:
+        - Key: Name
+          Value: !Ref DemopublicroutetablesName
+
+  DemoprivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref DemoVPC
+      Tags:
+        - Key: Name
+          Value: !Ref DemoprivateroutetablesName
+
+# NAT Gateway for Demoprivate
+
+  DemoprivateNATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      AllocationId: !GetAtt NATGatewayEIP.AllocationId
+      Tags:
+        - Key: Name
+          Value: !Ref natGatewayName
+
+  NATGatewayEIP:
+   Type: AWS::EC2::EIP
+   Properties:
+      Domain: vpc
+  RouteNATGateway:
+   DependsOn: DemoprivateNATGateway
+   Type: AWS::EC2::Route
+   Properties:
+      RouteTableId: !Ref DemoprivateRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref DemoprivateNATGateway
+
+# attach subnet(private and public) to route table
+
+  DemopublicRouteAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref DemopublicRouteTable
+
+  DemopublicRouteAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref DemopublicRouteTable
+
+  DemopublicRouteAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet3
+      RouteTableId: !Ref DemopublicRouteTable
+
+  DemoprivateRouteAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref DemoprivateRouteTable
+
+  DemoprivateRouteAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref DemoprivateRouteTable
+
+  DemoprivateRouteAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet3
+      RouteTableId: !Ref DemoprivateRouteTable
+
+# set route to route table
+
+  DemopublicRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref DemopublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref DemopublicInternetGateway
+
+  DemopublicRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref DemopublicRouteTable
+      DestinationCidrBlock: '10.0.0.0/8'
+      GatewayId: !Ref DemopublicInternetGateway
+
+  DemopublicRoute3:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref DemopublicRouteTable
+      DestinationCidrBlock: '172.18.0.0/21'
+      GatewayId: !Ref DemopublicInternetGateway
+     
