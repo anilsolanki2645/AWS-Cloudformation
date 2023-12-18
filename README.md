@@ -1,2 +1,2 @@
-# AWS-Cloudformation
+# AWS-Cloudformation-Scripts
 AWS-cloudformation templates including all the IAC configuration including EC2, VPC, AWS Backup, Cloudwatch, SNS,  RDS etc...
