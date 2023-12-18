@@ -1,0 +1,123 @@
+###################################### Important Notes ################################################################# 
+
+    #1. mustbe you have add imageid, security group id, and subnet id and key name which we can create in previous code
+    #2. Please provide proper IDs in parameter when run the script
+    #3. in this script we have 2 Instance (Public and Private) in same VPC
+    #4. here we can also create a security group but we include as a already created one
+    #5. you have to must be create a key-pair 
+
+########################################################################################################################
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+
+    # Public Instance parameter
+
+  PublicInstanceName:
+    Type: String
+    Description: Enter instance name for Public.
+
+  PublicInstanceType:
+    Type: String
+    Default: t2.micro
+    Description: Enter t2.micro, m1.small, m1.large. Default is t2.micro.
+
+  PublicImageid:
+    Type: String
+    Default: ami-0287a05f0ef0e9d9a  # Ubuntu 20.04 LTS 64-bit
+    Description: Enter the ImageId which is used to launch a Public instance.
+
+  PublicSubnetid:
+    Type: String
+    Description: Enter subnet id for Public(public instance like public-subnet-1).
+
+  PublicKeyPairName:
+    Type: String
+    Default: Staging-server
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the public instances
+
+  PublicSecurityGroupId:
+    Type: String
+    Default: sg-0d6037e8df72ed233
+    Description: Security group id for public instances
+
+  # Private Instance parameter
+
+  PrivateInstanceName:
+    Type: String
+    Description: Enter instance name for Private.
+
+  PrivateInstanceType:
+    Type: String
+    Default: t2.micro
+    Description: Enter t2.micro, m1.small, m1.large. Default is t2.micro.
+
+  PrivateImageid:
+    Type: String
+    Default: ami-0287a05f0ef0e9d9a  # Ubuntu 20.04 LTS 64-bit
+    Description: Enter the ImageId for Private (Private instance).
+
+  PrivateSubnetid:
+    Type: String
+    Description: Enter subnet id for Private(Private instance like private-subnet-1). 
+
+  PrivateKeyPairName:
+    Type: String
+    Default: Production-server
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the private instances
+
+  PrivateSecurityGroupId:
+    Type: String
+    Default: sg-0512ff102af9df78f
+    Description: Security group id for private instances
+
+Resources:
+
+  # Public instance
+  PublicKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref PublicKeyPairName
+
+  Public:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref PublicImageid
+      InstanceType: !Ref PublicInstanceType
+      KeyName: !Ref PublicKeyPair
+      SecurityGroupIds:
+        - !Ref PublicSecurityGroupId
+      SubnetId: !Ref PublicSubnetid
+      Tags:
+        - Key: Name
+          Value: !Ref PublicInstanceName
+
+  # Private instance
+  PrivateKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Ref PrivateKeyPairName
+
+  Private:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref PrivateImageid
+      InstanceType: !Ref PrivateInstanceType
+      KeyName: !Ref PrivateKeyPair
+      SecurityGroupIds:
+        - !Ref PrivateSecurityGroupId
+      SubnetId: !Ref PrivateSubnetid
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateInstanceName
+
+Outputs:
+
+  PublicInstanceId:
+    Description: Instance ID for the Public instance.
+    Value: !Ref Public
+
+  PrivateInstanceId:
+    Description: Instance ID for the Private instance.
+    Value: !Ref Private

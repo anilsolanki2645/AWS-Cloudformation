@@ -1,0 +1,88 @@
+#Security group
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+
+  VpcId:
+    Type: String
+    Default: vpc-0ada466a8030cf4c2 # must be change
+    Description: Enter the VPC ID where the security groups will be created.
+
+  PublicGroupName:
+    Type: String
+    Default: PublicGroup
+    Description: Enter the name for the Public Security Group.
+
+  PrivateGroupName:
+    Type: String
+    Default: PrivateGroup
+    Description: Enter the name for the Private Security Group.
+
+Resources:
+
+  PublicSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Public
+      GroupName: !Ref PublicGroupName
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: !Ref PublicGroupName
+
+  PrivateSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Private
+      GroupName: !Ref PrivateGroupName
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: !Ref PrivateGroupName
+
+Outputs:
+
+  PublicSecurityGroupId:
+    Description: Security Group ID for the Public Security Group.
+    Value: !GetAtt PublicSecurityGroup.GroupId
+
+  PrivateSecurityGroupId:
+    Description: Security Group ID for the Private Security Group.
+    Value: !GetAtt PrivateSecurityGroup.GroupId
+
+      
