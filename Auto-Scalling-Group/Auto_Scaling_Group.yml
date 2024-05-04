@@ -1,0 +1,197 @@
+###################################### Important Notes ########################################### 
+
+    #1. In this script put SubnetIds, AMI Id, SecurityGroup, keyname manually in parameter
+    #2. In this script include Application Loadbalancer, Target Group, Listener, ASG Launchconfiguration and Autoscaling Group.
+
+###################################################################################################
+
+
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+
+#################################### ApplicationLoadbalancer parameters #######################################
+  ApplicationLoadbalancerName:
+    Type: String
+    Default: Edurate-ALB
+    Description: Enter Application Loadbalancer Name.
+
+  SchemeForALB:
+    Type: String
+    Default: internet-facing
+    Description: Enter Scheme for Application Loadbalancer.
+
+  SecurityGroupsForALB:
+    Type: String
+    Description: Enter SecurityGroups id for Application Loadbalancer.
+
+  Subnet1ForALB: 
+    Type: String
+    Description: Enter id of Subnet1 for Application Loadbalancer.
+
+  Subnet2ForALB:
+    Type: String
+    Description: Enter id of Subnet2 for Application Loadbalancer.
+
+  Subnet3ForALB:
+    Type: String
+    Description: Enter id of Subnet3 for Application Loadbalancer.
+
+#################################### Target group parameters #######################################
+  TargetGroupName:
+    Type: String
+    Default: Edurate-TargetGroup
+    Description: Enter name of Target Group.
+
+  TargetGroupPort:
+    Type: Number
+    Default: 80
+    Description: Enter Port for Target Group.
+
+  TargetGroupProtocol:
+    Type: String
+    Default: HTTP
+    Description: Enter Protocol for Target Group.
+
+  TargetGroupVpcid:
+    Type: String
+    Description: Enter Vpcid for Target Group.
+  
+  TargetGroupTargetType:
+    Type: String
+    Default: instance
+    Description: Enter TargetType for Target Group.
+
+  #for Listener
+
+  ListenerPort:
+    Type: Number
+    Default: 80
+    Description: Enter Port for Target Listener.
+
+  ListenerProtocol:
+    Type: String
+    Default: HTTP
+    Description: Enter Protocol for Target Listener.
+
+#################################### ASG Launchconfiguration parameters #######################################
+
+  LaunchConfigurationName:
+    Type: String
+    Default: ASGLaunchConfig
+    Description: Enter Launch Configuration Name.
+
+  LaunchConfigurationImageId:
+    Type: String
+    Default: ami-089b4f43a272c6521
+    Description: Enter Launch Configuration Image id.
+
+  LaunchConfigurationInstanceType:
+    Type: String
+    Default: t3.micro
+    Description: Enter Launch Configuration InstanceType.
+
+  LaunchConfigurationKeyName:
+    Type: String
+    Default: cloudwatch-demo
+    Description: Enter Launch Configuration KeyName.
+
+  LaunchConfigurationSecurityGroups:
+    Type: String
+    Description: Enter Launch Configuration SecurityGroups.
+
+#################################### ASG parameters #######################################
+
+  ASGName:
+    Type: String
+    Default: cloudwatch-demo
+    Description: Enter Autoscaling group Name.
+  
+  ASGMinSize:
+    Type: Number
+    Default: 1
+    Description: Enter Autoscaling group Instance minimum size.
+
+  ASGMaxSize:
+    Type: Number
+    Default: 3
+    Description: Enter Autoscaling group Instance maximum size.
+
+  ASGDesiredCapacity:
+    Type: Number
+    Default: 1
+    Description: Enter Autoscaling group Instance DesiredCapacity.
+
+  ASGVPCZoneIdentifier:
+    Type: String
+    Description: Enter Autoscaling group VPCZoneIdentifier, subnet id.
+  
+
+############################################### Parameter section complete ####################################
+
+Resources:
+
+# Application Loadbalancer
+
+  EdurateAppProdALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Ref ApplicationLoadbalancerName
+      Scheme: !Ref SchemeForALB
+      SecurityGroups:
+        - !Ref SecurityGroupsForALB
+      Subnets:
+        - !Ref Subnet1ForALB
+        - !Ref Subnet2ForALB
+        - !Ref Subnet3ForALB
+
+#Target Group
+
+  EdurateTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Ref TargetGroupName
+      Port: !Ref TargetGroupPort
+      Protocol: !Ref TargetGroupProtocol
+      VpcId: !Ref TargetGroupVpcid
+      TargetType: !Ref TargetGroupTargetType
+
+  EdurateListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref EdurateAppProdALB
+      Port: !Ref ListenerPort
+      Protocol: !Ref ListenerProtocol
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref EdurateTargetGroup
+
+#ASG LaunchConfiguration
+
+  ASGLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      LaunchConfigurationName: !Ref LaunchConfigurationName
+      ImageId: !Ref LaunchConfigurationImageId
+      InstanceType: !Ref LaunchConfigurationInstanceType
+      KeyName: !Ref LaunchConfigurationKeyName
+      SecurityGroups:
+        - !Ref LaunchConfigurationSecurityGroups
+      
+#ASG
+
+  EdurateASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Ref ASGName
+      LaunchConfigurationName: !Ref ASGLaunchConfig
+      MinSize: !Ref ASGMinSize
+      MaxSize: !Ref ASGMaxSize
+      DesiredCapacity: !Ref ASGDesiredCapacity
+      VPCZoneIdentifier: 
+        - !Ref ASGVPCZoneIdentifier  #private subnet id
+      
+      TargetGroupARNs:
+        - !Ref EdurateTargetGroup
+      
+
+      
