@@ -16,8 +16,6 @@ This repository contains a collection of AWS CloudFormation templates for automa
 - [Requirements](#requirements)
 - [Setup and Usage](#setup-and-usage)
 - [Best Practices](#best-practices)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Overview
 
