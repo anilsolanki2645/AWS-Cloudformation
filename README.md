@@ -89,6 +89,30 @@ AWS-Cloudformation-Scripts is designed to simplify the setup and management of A
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/AWS-Cloudformation-Scripts.git
-   cd AWS-Cloudformation-Scripts
-  ```
+   git clone https://github.com/anilsolanki2645/AWS-Cloudformation.git
+   cd AWS-Cloudformation
+
+2. **Review Templates**:
+
+- Navigate to the /templates directory.
+- Customize template parameters as per your requirements.
+
+3. **Deploy a Template**:
+
+- Use the AWS CLI to deploy the stack.
+- Example command:
+  ```bash
+  aws cloudformation deploy --template-file templates/ec2.yaml --stack-name my-ec2-stack
+
+4. **Updating a Stack**:
+
+- Modify the template and use the following command
+  ```bash
+  aws cloudformation update-stack --stack-name my-ec2-stack --template-body file://templates/ec2.yaml
+
+5. **Deleting a Stack**:
+   
+- Use the AWS CLI or Management Console to delete the stack when no longer needed.
+  ```bash
+  aws cloudformation delete-stack --stack-name my-ec2-stack
+
