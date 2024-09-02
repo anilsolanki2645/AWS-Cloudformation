@@ -116,3 +116,11 @@ AWS-Cloudformation-Scripts is designed to simplify the setup and management of A
   ```bash
   aws cloudformation delete-stack --stack-name my-ec2-stack
 
+## Best Practices
+
+- **Version Control**: Keep track of changes in templates using Git.
+- **Parameters and Mappings**: Use parameters to make templates reusable.
+- **Stack Policies**: Protect critical resources from unintended updates.
+- **Resource Tags**: Use tags for cost allocation, security, and resource management.
+- **Validation**: Use `cfn-lint` or AWS CloudFormation Designer to validate templates before deployment.
+
